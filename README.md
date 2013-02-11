@@ -1,4 +1,4 @@
-teach_txt
+web2txt
 =========
 
 Send txt messages from a website using an email account.
