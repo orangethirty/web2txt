@@ -1,3 +1,5 @@
+**Note: in development. API currently does not work at all. **
+
 web2txt
 =========
 
