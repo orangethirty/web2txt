@@ -1,1 +1,10 @@
-{"tmobile" : "@tmomail.com"}
+{"tmobile" : "@tmomail.com",
+ "verizon" : "@vtext.com",
+ "att" : "@txt.att.net",
+ "att_enterprise_paging" : "@page.att.net",
+ "claro_puerto_rico" : "@vtexto.com",
+ "google_voice" : "@txt.voice.google.com",
+ "sprint" : "@messaging.sprintpcs.com",
+ "tracfone" : "@mmst5.tracfone.com",
+ "virgin_mobile" : "@vmobl.com"
+}

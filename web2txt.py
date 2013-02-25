@@ -11,6 +11,8 @@ Write code to test the /text method. Need to write a
 request in json and POST it with Requests.
 
 
+list of sms gateways from wikipedia: https://en.wikipedia.org/wiki/List_of_SMS_gateways
+
 
 """
 import smtplib

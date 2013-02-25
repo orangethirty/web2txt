@@ -6,7 +6,7 @@ web2txt
 Send txt messages from a website using an email account.
 
 The project is being developed to help people message others without having to incur in paying for txt as an API 
-service.
+service. This allows you to run your own texting API with no extra cost.
 
 
 ##Requirements
@@ -21,3 +21,6 @@ sqlite3
 GNU GPL
 
 Copyright orangethirty@gmail.com
+
+
+
