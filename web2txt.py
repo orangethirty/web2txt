@@ -1,28 +1,31 @@
 """Need to get complete list of carriers. And test this.
 Note: code is quite unfinished.
+right now it runs but /text method is not tested yet.
+everything else is.
 
-TODO: finish error messages. test new code. do json data structure. do 200OK responses.
+TODO: finish error messages. test new code.  do 200OK responses.
 Clean it up. Update readme. Write docs. :)
-
-have config be loaded from JSON file. easier to change settings.
 Add error reporting to syslog.
 
+Write code to test the /text method. Need to write a 
+request in json and POST it with Requests.
+
+
+
 """
-
-from flask import Flask, request, jsonify, Response
-
 import smtplib
+import json
+from flask import Flask, request, jsonify, Response
+from utils import load_config, load_carriers_list, get_carrier 
 
-#List of carriers
-CARRIERS = {'tmobile' : '@tmomail.net'}
+
+#api setup
+#tested. cofig and carriers working as intended.
+CONFIG = load_config()
+CARRIERS = load_carriers_list()
 
 
-#email account setup
-USERNAME = 'your_username'
-PASSWORD = 'our_password'
-FROM = 'email@address'
 
-SMTP_ADDRESS = 'smtp.gmail:587'  # as an example for testing.
 
 
 #flask setup
@@ -39,40 +42,29 @@ def index():
 @app.route("/text", methods=['POST'])
 def send_text():
     """Sends the txt message from data passed through POST."""
-    try:
-        if request.method == 'POST':                                 
-            if request.headers['Content-Type'] == 'application/json':
-                data = request.json                  #convert the json into a dict
-                carrier = get_carrier(data['carrier'])  #check to see if we support carrier.
-                if carrier is not 'Carrier not supported': #if carrier is not supported we raise the exception below
-                    try:                        
-                        number = data['number']            
-                        msg = data['msg']
-                        TO =  "{0}{1}".format(number, carrier)  #need to know how to check for the carrier. Make pe
-                        mail = smtplib.SMTP(SMTP_ADDRESS)
-                        mail.starttls()
-                        mail.login(USERNAME, PASSWORD)
-                        mail.sendmail(FROM, TO, msg)
-                        mail.quit()
-                        return #json response 200 OK
-                    except:
-                        return 'message could not be sent plus http error code.'
-    except:
-        return 'some error message'
-
-
-def get_carrier(carrier):
-    try:
-        if carrier == 'tmobile':
-            return CARRIERS['tmobile']
-    except:
-        raise ValueError:
-            return 'Carrier not supported.'
-            
-            
-
-
-
+    if request.method == 'POST':                                 
+        if request.headers['Content-Type'] == 'application/json':
+            data = request.json                  #convert the json into a dict
+            carrier = get_carrier(data['carrier'])  #check to see if we support carrier.
+            if carrier is not None:
+                number = data['number']            
+                msg = data['msg']
+                TO =  "{0}{1}".format(number, carrier)
+                mail = smtplib.SMTP(CONFIG['smtp_address'])
+                mail.starttls()
+                mail.login(CONFIG['username'], CONFIG['passoword'])
+                mail.sendmail(FROM, TO, msg)
+                mail.quit()
+                return #json response 200 OK
+            #if the carrier is not supported or found in the carriers list.
+            else: 
+                return "http error message with carrier not supported message."
+        #if the content type is not json
+        else:
+            return "http error messahe only JSON accepted." 
+    #if the request is not a POST
+    else:
+        return "the http error message that corresponds to this."
 
 
 if __name__ == "__main__":

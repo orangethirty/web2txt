@@ -1,0 +1,8 @@
+{"username" : "test",
+ "password" : "123",
+ "from" : "me",
+ "smtp_address" : "smtp.gmail:587"
+}
+
+
+
