@@ -1,7 +1,9 @@
-{"username" : "your_username",
- "password" : "your_password",
- "from" : "FROM WHO?",
- "smtp_address" : "smtp.FOO.com:PORT"}
+{"username" : "",
+ "password" : "",
+ "from" : "",
+ "smtp_address" : "",
+ "api_key" : ""
+}
 
 
 

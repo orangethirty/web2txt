@@ -1,4 +1,4 @@
-**Note: in development. API does work as is, but lacks logging and proper docs. **
+*Docs are in the Wiki.*
 
 web2txt
 =========
@@ -12,7 +12,7 @@ service. This allows you to run your own texting API with no extra cost.
 
 This uses the option carriers give to send text messages through email.
 You set it up on your server and have it listen at a given port.
-Then you make a POST request to /text with the text data as JSON (example in docs).
+Then you make a POST request to /text with the text data as JSON (example in docs (Wiki)).
 The API takes care of the rest. If the message is sent succesfully you receieve a code 200 from the API.
 
 
