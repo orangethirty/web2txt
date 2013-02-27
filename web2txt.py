@@ -4,9 +4,14 @@ Note: code is tested and working, but unfinished.
 TODO: 
 Clean it up. Update readme. Write docs. :)
 Add error reporting to syslog.
+
+TEST logging code!
+
+
 """
 
-
+import logging
+import logging.handlers
 import smtplib
 from flask import Flask, request, jsonify, Response, json
 from utils import load_config, load_carriers 
@@ -14,17 +19,24 @@ from utils import load_config, load_carriers
 
 #flask setup
 app = Flask(__name__)
-PORT = 5000 #port number you will be listening at. change to fit your needs
+PORT = 5000 #port number you will be listening at. change to fit your needs. note: not used currently
 
 
 @app.route("/")
 def index():
     return 'web2txt API'
 
+
 #send the txt message	
 @app.route("/text", methods=['POST'])
 def send_text():
     """Sends the txt message from data passed through POST."""
+    
+    #logging
+    my_logger = logging.getLogger('web2txt logger')
+    my_logger.setLevel(logging.DEBUG)
+    handler = logging.handlers.SysLogHandler(address = '/var/log')
+    my_logger.addHandler(handler)
     
     if request.method == 'POST':                                 
         
@@ -56,6 +68,7 @@ def send_text():
             #if the carrier is not supported or found in the carriers list.
             else: 
                 log = "Carrier not supported."
+                my_logger.debug(log)
                 resp = {"response" : log}
                 response = Response(json.dumps(resp), status=404, mimetype='application/json')
                 return response
@@ -63,6 +76,7 @@ def send_text():
         #if the content type is not json
         else:
             log = "Wrong request content-type. API only support JSON."
+            my_logger.debug(log)
             resp = {"response" : log}
             response = Response(json.dumps(resp), status=415, mimetype='application/json')
             return response 
@@ -70,6 +84,7 @@ def send_text():
     #if the request is not a POST. note that flask handles this but included anyways. 
     else:
         log = "Method Not Allowed. The method GET is not allowed for the requested URL."
+        my_logger.debug(log)
         resp = {"response" : log}
         response = Response(json.dumps(resp), status=405, mimetype='application/json')
         return response
@@ -78,4 +93,6 @@ def send_text():
 if __name__ == "__main__":
     #if you need to debug, replace the line below with: app.run(debug=True)
     app.run()
+
+
     
