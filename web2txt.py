@@ -10,7 +10,7 @@ from utils import load_config, load_carriers, logging
 #flask setup
 app = Flask(__name__)
 
-#port number you will be listening at. change to fit your needs. note: not used currently
+#port number you will be listening at. change to fit your needs.
 PORT = 5000 
 
 
