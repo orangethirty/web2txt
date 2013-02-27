@@ -1,4 +1,4 @@
-**Note: in development. API currently does not work at all. **
+**Note: in development. API does work as is, but lacks logging and proper docs. **
 
 web2txt
 =========
@@ -20,7 +20,7 @@ The API takes care of the rest. If the message is sent succesfully you receieve 
 
 Flask
 smtplib
-sqlite3
+
 
 
 ##License
