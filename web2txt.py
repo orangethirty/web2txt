@@ -1,39 +1,20 @@
-"""Need to get complete list of carriers. And test this.
-Note: code is quite unfinished.
-right now it runs but /text method is not tested yet.
-everything else is.
+"""
+Note: code is tested and working, but unfinished.
 
-TODO: finish error messages. test new code.  do 200OK responses.
+TODO: 
 Clean it up. Update readme. Write docs. :)
 Add error reporting to syslog.
-
-Write code to test the /text method. Need to write a 
-request in json and POST it with Requests.
-
-
-list of sms gateways from wikipedia: https://en.wikipedia.org/wiki/List_of_SMS_gateways
-
-
 """
+
+
 import smtplib
-import json
-from flask import Flask, request, jsonify, Response
-from utils import load_config, load_carriers_list, get_carrier 
-
-
-#api setup
-#tested. cofig and carriers working as intended.
-CONFIG = load_config()
-CARRIERS = load_carriers_list()
-
-
-
+from flask import Flask, request, jsonify, Response, json
+from utils import load_config, load_carriers 
 
 
 #flask setup
 app = Flask(__name__)
 PORT = 5000 #port number you will be listening at. change to fit your needs
-
 
 
 @app.route("/")
@@ -44,43 +25,57 @@ def index():
 @app.route("/text", methods=['POST'])
 def send_text():
     """Sends the txt message from data passed through POST."""
+    
     if request.method == 'POST':                                 
+        
         if request.headers['Content-Type'] == 'application/json':
-            data = request.json                  #convert the json into a dict
-            carrier = get_carrier(data['carrier'])  #check to see if we support carrier.
-            if carrier is not None:
+            #converts json to python dict
+            data = request.json
+            #get list of carriers from carriers.json                      
+            carriers = load_carriers() 
+            
+            if data['carrier'] in carriers:
+                #prepare the message
                 number = data['number']            
                 msg = data['msg']
-                TO =  "{0}{1}".format(number, carrier)
+                to =  "{0}{1}".format(number, carrier)
+                CONFIG = load_config()
+                FROM = CONFIG['from']
+                #sends the actual message
                 mail = smtplib.SMTP(CONFIG['smtp_address'])
                 mail.starttls()
-                mail.login(CONFIG['username'], CONFIG['passoword'])
-                mail.sendmail(FROM, TO, msg)
+                mail.login(CONFIG['username'], CONFIG['password'])
+                mail.sendmail(FROM, to, msg)
                 mail.quit()
-                return #json response 200 OK
+                #prepare the json response to your app.
+                log = "Message: '{0}' was sent succesfuly sent to '{1}'.".format(msg, to)
+                resp = {"response" : log}
+                response = Response(json.dumps(resp), status=200, mimetype='application/json')
+                return response
+            
             #if the carrier is not supported or found in the carriers list.
             else: 
-                return "http error message with carrier not supported message."
+                log = "Carrier not supported."
+                resp = {"response" : log}
+                response = Response(json.dumps(resp), status=404, mimetype='application/json')
+                return response
+        
         #if the content type is not json
         else:
-            return "http error messahe only JSON accepted." 
-    #if the request is not a POST
+            log = "Wrong request content-type. API only support JSON."
+            resp = {"response" : log}
+            response = Response(json.dumps(resp), status=415, mimetype='application/json')
+            return response 
+    
+    #if the request is not a POST. note that flask handles this but included anyways. 
     else:
-        return "the http error message that corresponds to this."
+        log = "Method Not Allowed. The method GET is not allowed for the requested URL."
+        resp = {"response" : log}
+        response = Response(json.dumps(resp), status=405, mimetype='application/json')
+        return response
 
 
 if __name__ == "__main__":
+    #if you need to debug, replace the line below with: app.run(debug=True)
     app.run()
     
-    
-    
-    
-    
-"""
-How the API will work:
-
-This uses the option carriers give to send text messages through email.
-You set it up on your server and have it listen at a given port.
-Then you make a POST request to /text with the text data as JSON (JSON data structure is to be designed.)
-the system takes care of the rest. If the message is sent succesfully you receieve a code 200 from the API.
-"""
